@@ -1,0 +1,5 @@
+-- AlterTable
+ALTER TABLE "Workspace" ALTER COLUMN "createdAt" SET DEFAULT CURRENT_TIMESTAMP;
+
+-- AlterTable
+ALTER TABLE "WorkspaceMember" ALTER COLUMN "createdAt" SET DEFAULT CURRENT_TIMESTAMP;

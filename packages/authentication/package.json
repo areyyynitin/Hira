@@ -1,0 +1,24 @@
+{
+  "name": "@repo/authentication",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "exports":{
+    "./auth":"./src/auth.ts"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "better-auth": "^1.6.4",
+    "@repo/db":"workspace:*"
+  },
+  "devDependencies": {
+
+    "@repo/typescript-config": "workspace:*",
+    "@repo/db":"workspace:*"
+  }
+}
