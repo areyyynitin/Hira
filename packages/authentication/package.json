@@ -17,7 +17,6 @@
     "@repo/db":"workspace:*"
   },
   "devDependencies": {
-
     "@repo/typescript-config": "workspace:*",
     "@repo/db":"workspace:*"
   }

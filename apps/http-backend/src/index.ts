@@ -1,11 +1,12 @@
 import express from  "express";
-import { requireUser } from "./middleware";
 import cors from "cors";
-import { prisma } from "@repo/db/client";
+import { createServer } from "http";
 import { workspaceRouter } from "./routes/workspace";
 import { taskRouter } from "./routes/task";
+import { initSocket } from "./socket";
 
 const app = express();
+const httpServer = createServer(app);
 
 app.use(
   cors({
@@ -19,7 +20,8 @@ app.use(express.json());
 app.use("/workspace" , workspaceRouter)
 app.use("/task" , taskRouter)
 
+initSocket(httpServer);
 
-app.listen(3001 , () => {
+httpServer.listen(3001 , () => {
     console.log("HTTP Backend is running on port 3001");
 })

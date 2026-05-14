@@ -25,6 +25,7 @@ model User {
   accounts         Account[]
   workspaceMembers WorkspaceMember[]
   taskAssignees    TaskAssignee[]
+  taskComments     TaskComment[]
 
   @@unique([email])
   @@map("user")
@@ -136,6 +137,7 @@ model Task {
   createdById String
 
   assignees TaskAssignee[]
+  comments  TaskComment[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -149,8 +151,24 @@ model TaskAssignee {
 
   task Task @relation(fields: [taskId], references: [id], onDelete: Cascade)
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  startedAt DateTime?
+  completedAt DateTime?
+  timeSpentSeconds Int?
 
   @@unique([taskId, userId])
+}
+
+model TaskComment {
+  id Int @id @default(autoincrement())
+
+  taskId Int
+  authorId String
+  content String
+
+  createdAt DateTime @default(now())
+
+  task Task @relation(fields: [taskId], references: [id], onDelete: Cascade)
+  author User @relation(fields: [authorId], references: [id], onDelete: Cascade)
 }
 
 enum TaskStatus {

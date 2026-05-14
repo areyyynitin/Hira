@@ -1,6 +1,7 @@
 import express, { Router } from "express";
 import { prisma } from "@repo/db/client";
 import { requireUser } from "../middleware";
+import { getIO } from "../socket";
 
 export const workspaceRouter: Router = express.Router();
 
@@ -31,6 +32,10 @@ workspaceRouter.post("/", requireUser, async (req, res) => {
       },
     });
 
+    getIO().to(`user:${user.id}`).emit("workspace:added", {
+      workspaceId: workspace.id,
+    });
+
     return res.json({
       workspace,
       message: "Workspace created successfully",
@@ -48,7 +53,7 @@ workspaceRouter.post("/:workspaceId/invite", requireUser, async (req, res) => {
     const { workspaceId } = req.params;
     const { role } = req.body;
 
-    // check if user is ADMIN
+    // check if user can invite (ADMIN or MANAGER)
     const member = await prisma.workspaceMember.findFirst({
       where: {
         userId: user.id,
@@ -56,7 +61,7 @@ workspaceRouter.post("/:workspaceId/invite", requireUser, async (req, res) => {
       },
     });
 
-    if (!member || member.role !== "ADMIN") {
+    if (!member || (member.role !== "ADMIN" && member.role !== "MANAGER")) {
       return res.status(403).json({ error: "FORBIDDEN" });
     }
 
@@ -131,6 +136,15 @@ workspaceRouter.post("/join/:token", requireUser, async (req, res) => {
       },
     });
 
+    getIO().to(`workspace:${invite.workspaceId}`).emit("workspace:member_joined", {
+      workspaceId: invite.workspaceId,
+      userId: user.id,
+      role: invite.role,
+    });
+    getIO().to(`user:${user.id}`).emit("workspace:added", {
+      workspaceId: invite.workspaceId,
+    });
+
     return res.status(200).json({
       message: "Joined successfully",
       success: true,
@@ -188,6 +202,12 @@ workspaceRouter.patch("/member/:id", requireUser, async (req, res) => {
   const updated = await prisma.workspaceMember.update({
     where: { id: Number(id) },
     data: { role },
+  });
+
+  getIO().to(`workspace:${updated.workspaceId}`).emit("workspace:member_updated", {
+    workspaceId: updated.workspaceId,
+    memberId: updated.id,
+    role: updated.role,
   });
 
   return res.json(updated);

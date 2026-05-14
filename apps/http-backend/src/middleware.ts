@@ -13,6 +13,7 @@ export async function requireUser(req:Request, res:Response, next:NextFunction) 
     const session = await response.json();
 
     if (!session?.user) {
+      console.log("UNAUTHORIZED");
       return res.status(401).json({ error: "UNAUTHORIZED" });
     }
 
